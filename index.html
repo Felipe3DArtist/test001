@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Pong Game</title>
+  <style>
+    body { text-align: center; font-family: Arial, sans-serif; }
+    canvas { background: #000; display: block; margin: 0 auto; }
+  </style>
+</head>
+<body>
+  <h1>Welcome to Pong!</h1>
+  <canvas id="game" width="600" height="400"></canvas>
+  <script>
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+
+    const paddleWidth = 10;
+    const paddleHeight = 80;
+    const ballSize = 10;
+
+    let leftY = canvas.height / 2 - paddleHeight / 2;
+    let rightY = canvas.height / 2 - paddleHeight / 2;
+
+    const paddleSpeed = 5;
+    const ball = {
+      x: canvas.width / 2 - ballSize / 2,
+      y: canvas.height / 2 - ballSize / 2,
+      vx: 4,
+      vy: 4
+    };
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, leftY, paddleWidth, paddleHeight);
+      ctx.fillRect(canvas.width - paddleWidth, rightY, paddleWidth, paddleHeight);
+      ctx.fillRect(ball.x, ball.y, ballSize, ballSize);
+    }
+
+    function update() {
+      ball.x += ball.vx;
+      ball.y += ball.vy;
+
+      if (ball.y <= 0 || ball.y + ballSize >= canvas.height) {
+        ball.vy *= -1;
+      }
+
+      if (ball.x <= paddleWidth && ball.y + ballSize >= leftY && ball.y <= leftY + paddleHeight) {
+        ball.vx *= -1;
+        ball.x = paddleWidth;
+      } else if (
+        ball.x + ballSize >= canvas.width - paddleWidth &&
+        ball.y + ballSize >= rightY &&
+        ball.y <= rightY + paddleHeight
+      ) {
+        ball.vx *= -1;
+        ball.x = canvas.width - paddleWidth - ballSize;
+      }
+
+      if (ball.x < 0 || ball.x > canvas.width) {
+        ball.x = canvas.width / 2 - ballSize / 2;
+        ball.y = canvas.height / 2 - ballSize / 2;
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowUp') {
+        rightY = Math.max(0, rightY - paddleSpeed);
+      }
+      if (e.key === 'ArrowDown') {
+        rightY = Math.min(canvas.height - paddleHeight, rightY + paddleSpeed);
+      }
+      if (e.key === 'w') {
+        leftY = Math.max(0, leftY - paddleSpeed);
+      }
+      if (e.key === 's') {
+        leftY = Math.min(canvas.height - paddleHeight, leftY + paddleSpeed);
+      }
+    });
+
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    loop();
+  </script>
+</body>
+</html>
